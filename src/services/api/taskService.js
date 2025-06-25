@@ -63,7 +63,7 @@ class TaskService {
     }).map(t => ({ ...t }));
   }
 
-  async create(taskData) {
+async create(taskData) {
     await delay(300);
     const newTask = {
       Id: Math.max(...this.tasks.map(t => t.Id), 0) + 1,
@@ -73,7 +73,13 @@ class TaskService {
       priority: taskData.priority || 'medium',
       dueDate: taskData.dueDate || null,
       createdAt: new Date().toISOString(),
-      completedAt: null
+      completedAt: null,
+      timeTracking: {
+        totalTime: 0,
+        sessions: [],
+        currentSession: null,
+        isRunning: false
+      }
     };
     this.tasks.push(newTask);
     return { ...newTask };
@@ -176,9 +182,132 @@ const deleted = this.tasks.splice(index, 1)[0];
       pending: total - completed,
       todayCount: (await today).length,
       overdueCount: (await overdue).length,
-      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
+completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
     };
-}
+  }
+
+  // Time Tracking Methods
+  async startTimer(id) {
+    await delay(150);
+    const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
+    if (index === -1) throw new Error('Task not found');
+    
+    const task = this.tasks[index];
+    
+    // Stop any other running timers
+    this.tasks.forEach((t, i) => {
+      if (t.timeTracking?.isRunning && i !== index) {
+        this.stopTimer(t.Id);
+      }
+    });
+    
+    // Initialize timeTracking if it doesn't exist
+    if (!task.timeTracking) {
+      task.timeTracking = {
+        totalTime: 0,
+        sessions: [],
+        currentSession: null,
+        isRunning: false
+      };
+    }
+    
+    // Start new session
+    const currentSession = {
+      startTime: new Date().toISOString(),
+      endTime: null,
+      duration: 0
+    };
+    
+    task.timeTracking.currentSession = currentSession;
+    task.timeTracking.isRunning = true;
+    
+    return { ...task };
+  }
+
+  async stopTimer(id) {
+    await delay(150);
+    const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
+    if (index === -1) throw new Error('Task not found');
+    
+    const task = this.tasks[index];
+    if (!task.timeTracking?.isRunning || !task.timeTracking.currentSession) {
+      throw new Error('Timer is not running');
+    }
+    
+    const endTime = new Date().toISOString();
+    const startTime = new Date(task.timeTracking.currentSession.startTime);
+    const duration = Math.floor((new Date(endTime) - startTime) / 1000);
+    
+    // Complete the current session
+    const completedSession = {
+      ...task.timeTracking.currentSession,
+      endTime,
+      duration
+    };
+    
+    // Add to sessions history
+    task.timeTracking.sessions.push(completedSession);
+    
+    // Update total time
+    task.timeTracking.totalTime += duration;
+    
+    // Reset current session
+    task.timeTracking.currentSession = null;
+    task.timeTracking.isRunning = false;
+    
+    return { ...task };
+  }
+
+  async pauseTimer(id) {
+    await delay(150);
+    return this.stopTimer(id); // For simplicity, pause works like stop
+  }
+
+  async resetTimer(id) {
+    await delay(150);
+    const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
+    if (index === -1) throw new Error('Task not found');
+    
+    const task = this.tasks[index];
+    
+    // Initialize or reset timeTracking
+    task.timeTracking = {
+      totalTime: 0,
+      sessions: [],
+      currentSession: null,
+      isRunning: false
+    };
+    
+    return { ...task };
+  }
+
+  async getTimeSpent(id) {
+    await delay(100);
+    const task = this.tasks.find(t => t.Id === parseInt(id, 10));
+    if (!task) throw new Error('Task not found');
+    
+    let totalTime = task.timeTracking?.totalTime || 0;
+    
+    // Add current session time if running
+    if (task.timeTracking?.isRunning && task.timeTracking.currentSession) {
+      const currentTime = new Date();
+      const startTime = new Date(task.timeTracking.currentSession.startTime);
+      const currentSessionTime = Math.floor((currentTime - startTime) / 1000);
+      totalTime += currentSessionTime;
+    }
+    
+    return totalTime;
+  }
+
+  formatTime(seconds) {
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours}h ${minutes}m ${secs}s`;
+return `${hours}h ${minutes}m ${secs}s`;
+  }
 }
 
 export default new TaskService();

@@ -27,11 +27,23 @@ const StatCard = ({ icon, label, value, color = 'primary', delay = 0 }) => (
 );
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState([]);
+const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+
+  // Auto-refresh for running timers
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const hasRunningTimer = tasks.some(task => task.timeTracking?.isRunning);
+      if (hasRunningTimer) {
+        loadData();
+      }
+    }, 10000); // Refresh every 10 seconds if timers are running
+
+    return () => clearInterval(interval);
+  }, [tasks]);
 
   const loadData = async () => {
     setLoading(true);

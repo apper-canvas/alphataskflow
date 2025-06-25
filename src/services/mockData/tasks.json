@@ -7,7 +7,19 @@
     "priority": "high",
     "dueDate": "2024-01-15",
     "createdAt": "2024-01-10T09:00:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 5400,
+      "sessions": [
+        {
+          "startTime": "2024-01-10T10:00:00Z",
+          "endTime": "2024-01-10T11:30:00Z",
+          "duration": 5400
+        }
+      ],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 2,
@@ -17,7 +29,13 @@
     "priority": "medium",
     "dueDate": "2024-01-18",
     "createdAt": "2024-01-11T14:30:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 0,
+      "sessions": [],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 3,
@@ -27,7 +45,19 @@
     "priority": "high",
     "dueDate": "2024-01-12",
     "createdAt": "2024-01-08T11:15:00Z",
-    "completedAt": "1/12/2024 4:45:00 PMZ"
+    "completedAt": "1/12/2024 4:45:00 PMZ",
+    "timeTracking": {
+      "totalTime": 7200,
+      "sessions": [
+        {
+          "startTime": "2024-01-08T13:00:00Z",
+          "endTime": "2024-01-08T15:00:00Z",
+          "duration": 7200
+        }
+      ],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 4,
@@ -37,7 +67,13 @@
     "priority": "medium",
     "dueDate": "2024-01-16",
     "createdAt": "2024-01-12T20:00:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 0,
+      "sessions": [],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 5,
@@ -47,7 +83,19 @@
     "priority": "low",
     "dueDate": "2024-01-20",
     "createdAt": "2024-01-10T13:20:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 3600,
+      "sessions": [
+        {
+          "startTime": "2024-01-10T14:00:00Z",
+          "endTime": "2024-01-10T15:00:00Z",
+          "duration": 3600
+        }
+      ],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 6,
@@ -57,7 +105,19 @@
     "priority": "high",
     "dueDate": "2024-01-13",
     "createdAt": "2024-01-13T08:00:00Z",
-    "completedAt": "2024-01-13T19:30:00Z"
+    "completedAt": "2024-01-13T19:30:00Z",
+    "timeTracking": {
+      "totalTime": 900,
+      "sessions": [
+        {
+          "startTime": "2024-01-13T19:15:00Z",
+          "endTime": "2024-01-13T19:30:00Z",
+          "duration": 900
+        }
+      ],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 7,
@@ -67,7 +127,13 @@
     "priority": "medium",
     "dueDate": "2024-01-17",
     "createdAt": "2024-01-11T16:45:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 0,
+      "sessions": [],
+      "currentSession": null,
+      "isRunning": false
+    }
   },
   {
     "Id": 8,
@@ -77,6 +143,12 @@
     "priority": "low",
     "dueDate": null,
     "createdAt": "2024-01-09T12:30:00Z",
-    "completedAt": null
+    "completedAt": null,
+    "timeTracking": {
+      "totalTime": 0,
+      "sessions": [],
+      "currentSession": null,
+      "isRunning": false
+    }
   }
 ]

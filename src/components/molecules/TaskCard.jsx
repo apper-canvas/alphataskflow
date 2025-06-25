@@ -1,21 +1,50 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { format, isPast, isToday, parseISO } from "date-fns";
 import ApperIcon from "@/components/ApperIcon";
 import Checkbox from "@/components/atoms/Checkbox";
 import Badge from "@/components/atoms/Badge";
-
 const TaskCard = ({ 
   task, 
   onToggleComplete, 
   onEdit, 
   onDelete,
+  onTimerStart,
+  onTimerStop,
   categoryColors = {},
   className = '',
   selectionMode = false,
   selected = false,
   onSelectionChange
 }) => {
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    
+    if (task.timeTracking?.isRunning && task.timeTracking.currentSession) {
+      interval = setInterval(() => {
+        const startTime = new Date(task.timeTracking.currentSession.startTime);
+        const elapsed = Math.floor((new Date() - startTime) / 1000);
+        const totalTime = (task.timeTracking?.totalTime || 0) + elapsed;
+        setCurrentTime(totalTime);
+      }, 1000);
+    } else {
+      setCurrentTime(task.timeTracking?.totalTime || 0);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [task.timeTracking]);
+
+  const formatTime = (seconds) => {
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  };
   const getPriorityColor = (priority) => {
     switch (priority) {
       case 'high': return '#ef4444';
@@ -85,7 +114,44 @@ const TaskCard = ({
               {task.title}
             </h3>
             
-            <div className="flex items-center gap-2">
+<div className="flex items-center gap-2">
+              {/* Time Tracking Display */}
+              {(currentTime > 0 || task.timeTracking?.isRunning) && (
+                <div className="flex items-center gap-1 text-xs text-surface-600 bg-surface-50 px-2 py-1 rounded-md">
+                  <ApperIcon name="Clock" size={12} />
+                  <span className={task.timeTracking?.isRunning ? 'text-primary-600 font-medium' : ''}>
+                    {formatTime(currentTime)}
+                  </span>
+                </div>
+              )}
+              
+              {/* Timer Controls */}
+              {onTimerStart && onTimerStop && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (task.timeTracking?.isRunning) {
+                      onTimerStop(task.Id);
+                    } else {
+                      onTimerStart(task.Id);
+                    }
+                  }}
+                  className={`p-1 rounded ${
+                    task.timeTracking?.isRunning 
+                      ? 'text-error hover:text-red-700 bg-red-50' 
+                      : 'text-green-600 hover:text-green-700 bg-green-50'
+                  }`}
+                  title={task.timeTracking?.isRunning ? 'Stop timer' : 'Start timer'}
+                >
+                  <ApperIcon 
+                    name={task.timeTracking?.isRunning ? "Square" : "Play"} 
+                    size={14} 
+                  />
+                </motion.button>
+              )}
+              
               {onEdit && (
                 <motion.button
                   whileHover={{ scale: 1.1 }}

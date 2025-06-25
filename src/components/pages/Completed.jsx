@@ -6,9 +6,21 @@ import TaskList from '@/components/organisms/TaskList';
 import taskService from '@/services/api/taskService';
 
 const Completed = () => {
-  const [completedTasks, setCompletedTasks] = useState([]);
+const [completedTasks, setCompletedTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Auto-refresh for running timers (though completed tasks shouldn't have running timers)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const hasRunningTimer = completedTasks.some(task => task.timeTracking?.isRunning);
+      if (hasRunningTimer) {
+        loadData();
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [completedTasks]);
 
   const loadData = async () => {
     setLoading(true);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "react-toastify";
 import taskService from "@/services/api/taskService";
@@ -18,10 +18,64 @@ const TaskList = ({
   emptyState = {},
   enableBulkActions = false
 }) => {
-  const [updatingTasks, setUpdatingTasks] = useState(new Set());
+const [updatingTasks, setUpdatingTasks] = useState(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedTasks, setSelectedTasks] = useState(new Set());
   const [bulkOperating, setBulkOperating] = useState(false);
+  const [timerOperations, setTimerOperations] = useState(new Set());
+
+  // Force re-render for running timers
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const hasRunningTimer = tasks.some(task => task.timeTracking?.isRunning);
+      if (hasRunningTimer) {
+        // Trigger re-render by updating state
+        setTimerOperations(prev => new Set(prev));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [tasks]);
+
+  const handleTimerStart = async (taskId) => {
+    if (timerOperations.has(taskId)) return;
+
+    setTimerOperations(prev => new Set([...prev, taskId]));
+    
+    try {
+      await taskService.startTimer(taskId);
+      onTaskUpdate?.();
+      toast.success('Timer started! 🕐');
+    } catch (error) {
+      toast.error('Failed to start timer');
+    } finally {
+      setTimerOperations(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleTimerStop = async (taskId) => {
+    if (timerOperations.has(taskId)) return;
+
+    setTimerOperations(prev => new Set([...prev, taskId]));
+    
+    try {
+      await taskService.stopTimer(taskId);
+      onTaskUpdate?.();
+      toast.success('Timer stopped! ⏹️');
+    } catch (error) {
+toast.error('Failed to stop timer');
+    } finally {
+      setTimerOperations(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+    }
+  };
 
   const handleSelectAll = () => {
     if (selectedTasks.size === tasks.length) {
@@ -257,10 +311,12 @@ return (
             transition={{ duration: 0.15 }}
             className={updatingTasks.has(task.Id) || bulkOperating ? 'opacity-50 pointer-events-none' : ''}
           >
-            <TaskCard
+<TaskCard
               task={task}
               onToggleComplete={handleToggleComplete}
               onDelete={handleDeleteTask}
+              onTimerStart={handleTimerStart}
+              onTimerStop={handleTimerStop}
               categoryColors={categoryColors}
               selectionMode={selectionMode}
               selected={selectedTasks.has(task.Id)}

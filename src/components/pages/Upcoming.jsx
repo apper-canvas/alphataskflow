@@ -7,10 +7,22 @@ import QuickAddModal from '@/components/organisms/QuickAddModal';
 import taskService from '@/services/api/taskService';
 
 const Upcoming = () => {
-  const [upcomingTasks, setUpcomingTasks] = useState([]);
+const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
+
+  // Auto-refresh for running timers
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const hasRunningTimer = upcomingTasks.some(task => task.timeTracking?.isRunning);
+      if (hasRunningTimer) {
+        loadData();
+      }
+    }, 10000); // Refresh every 10 seconds if timers are running
+
+    return () => clearInterval(interval);
+  }, [upcomingTasks]);
 
   const loadData = async () => {
     setLoading(true);
