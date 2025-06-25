@@ -1,6 +1,5 @@
 import taskData from "@/services/mockData/tasks.json";
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 class TaskService {
   constructor() {
     this.tasks = [...taskData];
@@ -85,7 +84,7 @@ async create(taskData) {
     return { ...newTask };
   }
 
-  async update(id, updates) {
+async update(id, updates) {
     await delay(250);
     const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
     if (index === -1) throw new Error('Task not found');
@@ -99,6 +98,11 @@ async create(taskData) {
     // Handle completion status change
     if (updates.completed !== undefined && updates.completed !== this.tasks[index].completed) {
       updatedTask.completedAt = updates.completed ? new Date().toISOString() : null;
+    }
+
+    // Handle archive status change
+    if (updates.archived !== undefined && updates.archived !== this.tasks[index].archived) {
+      updatedTask.archivedAt = updates.archived ? new Date().toISOString() : null;
     }
 
     this.tasks[index] = updatedTask;
@@ -299,15 +303,49 @@ completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
     return totalTime;
   }
 
-  formatTime(seconds) {
+formatTime(seconds) {
     if (seconds < 60) return `${seconds}s`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
     return `${hours}h ${minutes}m ${secs}s`;
-return `${hours}h ${minutes}m ${secs}s`;
+  }
+
+  // Archive Methods
+  async getArchivedTasks() {
+    await delay(200);
+    return this.tasks.filter(t => t.archived === true).map(t => ({ ...t }));
+  }
+
+  async archiveTask(id) {
+    await delay(250);
+    const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
+    if (index === -1) throw new Error('Task not found');
+    
+    const updatedTask = {
+      ...this.tasks[index],
+      archived: true,
+      archivedAt: new Date().toISOString()
+    };
+
+    this.tasks[index] = updatedTask;
+    return { ...updatedTask };
+  }
+
+  async restoreTask(id) {
+    await delay(250);
+    const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
+    if (index === -1) throw new Error('Task not found');
+    
+    const updatedTask = {
+      ...this.tasks[index],
+      archived: false,
+      archivedAt: null
+    };
+
+    this.tasks[index] = updatedTask;
+    return { ...updatedTask };
   }
 }
-
 export default new TaskService();

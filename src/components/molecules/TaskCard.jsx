@@ -11,6 +11,7 @@ const TaskCard = ({
   onDelete,
   onTimerStart,
   onTimerStop,
+  onRestore,
   categoryColors = {},
   className = '',
   selectionMode = false,
@@ -125,8 +126,24 @@ const TaskCard = ({
                 </div>
               )}
               
+              {/* Restore Button for Archived Tasks */}
+              {onRestore && (
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRestore(task.Id);
+                  }}
+                  className="p-1 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded"
+                  title="Restore task"
+                >
+                  <ApperIcon name="RotateCcw" size={14} />
+                </motion.button>
+              )}
+              
               {/* Timer Controls */}
-              {onTimerStart && onTimerStop && (
+              {onTimerStart && onTimerStop && !onRestore && (
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -152,7 +169,7 @@ const TaskCard = ({
                 </motion.button>
               )}
               
-              {onEdit && (
+              {onEdit && !onRestore && (
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -166,7 +183,7 @@ const TaskCard = ({
                 </motion.button>
               )}
               
-              {onDelete && (
+              {onDelete && !onRestore && (
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}

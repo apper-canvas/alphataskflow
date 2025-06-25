@@ -15,6 +15,7 @@ const TaskList = ({
   onRefresh,
   onTaskUpdate,
   onQuickAdd,
+  onRestore,
   emptyState = {},
   enableBulkActions = false
 }) => {
@@ -230,6 +231,24 @@ toast.error('Failed to stop timer');
         return newSet;
       });
     }
+};
+
+  const handleRestore = async (taskId) => {
+    if (updatingTasks.has(taskId)) return;
+
+    setUpdatingTasks(prev => new Set([...prev, taskId]));
+    
+    try {
+      await onRestore?.(taskId);
+    } catch (error) {
+      toast.error('Failed to restore task');
+    } finally {
+      setUpdatingTasks(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(taskId);
+        return newSet;
+      });
+    }
   };
 
   if (loading) {
@@ -246,8 +265,8 @@ toast.error('Failed to stop timer');
         icon={emptyState.icon || 'CheckSquare'}
         title={emptyState.title || 'No tasks found'}
         description={emptyState.description || 'Create your first task to get started'}
-        actionLabel={emptyState.actionLabel || 'Add Task'}
-        onAction={onQuickAdd}
+        actionLabel={emptyState.actionLabel}
+        onAction={emptyState.actionLabel ? onQuickAdd : null}
       />
     );
   }
@@ -317,6 +336,7 @@ return (
               onDelete={handleDeleteTask}
               onTimerStart={handleTimerStart}
               onTimerStop={handleTimerStop}
+              onRestore={onRestore ? handleRestore : null}
               categoryColors={categoryColors}
               selectionMode={selectionMode}
               selected={selectedTasks.has(task.Id)}

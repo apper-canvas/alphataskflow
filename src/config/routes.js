@@ -3,7 +3,7 @@ import Today from '@/components/pages/Today';
 import Upcoming from '@/components/pages/Upcoming';
 import Completed from '@/components/pages/Completed';
 import Categories from '@/components/pages/Categories';
-
+import Archive from '@/components/pages/Archive';
 export const routes = {
   dashboard: {
     id: 'dashboard',
@@ -33,12 +33,19 @@ export const routes = {
     icon: 'CheckCircle',
     component: Completed
   },
-  categories: {
+categories: {
     id: 'categories',
     label: 'Categories',
     path: '/categories',
     icon: 'Folder',
     component: Categories
+  },
+  archive: {
+    id: 'archive',
+    label: 'Archive',
+    path: '/archive',
+    icon: 'Archive',
+    component: Archive
   }
 };
 
