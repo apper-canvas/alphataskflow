@@ -1,4 +1,4 @@
-import taskData from "@/mockData/tasks.json";
+import taskData from "@/services/mockData/tasks.json";
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 class TaskService {
