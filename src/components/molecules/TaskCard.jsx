@@ -1,9 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { format, isToday, isPast, parseISO } from 'date-fns';
-import ApperIcon from '@/components/ApperIcon';
-import Checkbox from '@/components/atoms/Checkbox';
-import Badge from '@/components/atoms/Badge';
+import React from "react";
+import { motion } from "framer-motion";
+import { format, isPast, isToday, parseISO } from "date-fns";
+import ApperIcon from "@/components/ApperIcon";
+import Checkbox from "@/components/atoms/Checkbox";
+import Badge from "@/components/atoms/Badge";
 
 const TaskCard = ({ 
   task, 
@@ -11,7 +11,10 @@ const TaskCard = ({
   onEdit, 
   onDelete,
   categoryColors = {},
-  className = '' 
+  className = '',
+  selectionMode = false,
+  selected = false,
+  onSelectionChange
 }) => {
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -56,14 +59,17 @@ const TaskCard = ({
         borderLeftColor: getPriorityColor(task.priority)
       }}
     >
-      <div className="flex items-start gap-3">
+<div className="flex items-start gap-3">
         <motion.div
           whileTap={{ scale: 0.95 }}
           className="mt-0.5"
         >
           <Checkbox
-            checked={task.completed}
-            onChange={(e) => onToggleComplete(task.Id, e.target.checked)}
+            checked={selectionMode ? selected : task.completed}
+            onChange={selectionMode ? 
+              (e) => onSelectionChange?.(task.Id, e.target.checked) : 
+              (e) => onToggleComplete(task.Id, e.target.checked)
+            }
             size="md"
           />
         </motion.div>

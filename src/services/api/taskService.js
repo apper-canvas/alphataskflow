@@ -1,5 +1,4 @@
-import taskData from '../mockData/tasks.json';
-
+import taskData from "@/mockData/tasks.json";
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 class TaskService {
@@ -105,16 +104,63 @@ class TaskService {
     const index = this.tasks.findIndex(t => t.Id === parseInt(id, 10));
     if (index === -1) throw new Error('Task not found');
     
-    const deleted = this.tasks.splice(index, 1)[0];
+const deleted = this.tasks.splice(index, 1)[0];
     return { ...deleted };
   }
-
   async bulkDelete(ids) {
     await delay(300);
     const intIds = ids.map(id => parseInt(id, 10));
     const deleted = this.tasks.filter(t => intIds.includes(t.Id));
     this.tasks = this.tasks.filter(t => !intIds.includes(t.Id));
     return deleted.map(t => ({ ...t }));
+  }
+
+  async bulkUpdate(ids, updates) {
+    await delay(350);
+    const intIds = ids.map(id => parseInt(id, 10));
+    const updatedTasks = [];
+    
+    for (const id of intIds) {
+      const index = this.tasks.findIndex(t => t.Id === id);
+      if (index !== -1) {
+        const updatedTask = {
+          ...this.tasks[index],
+          ...updates,
+          Id: this.tasks[index].Id // Preserve Id
+        };
+
+        // Handle completion status change
+        if (updates.completed !== undefined && updates.completed !== this.tasks[index].completed) {
+          updatedTask.completedAt = updates.completed ? new Date().toISOString() : null;
+        }
+
+        this.tasks[index] = updatedTask;
+        updatedTasks.push({ ...updatedTask });
+      }
+    }
+    
+    return updatedTasks;
+  }
+
+  async bulkMoveToCategory(ids, categoryId) {
+    await delay(300);
+    const intIds = ids.map(id => parseInt(id, 10));
+    const updatedTasks = [];
+    
+    for (const id of intIds) {
+      const index = this.tasks.findIndex(t => t.Id === id);
+      if (index !== -1) {
+        const updatedTask = {
+          ...this.tasks[index],
+          categoryId: categoryId
+        };
+        
+        this.tasks[index] = updatedTask;
+        updatedTasks.push({ ...updatedTask });
+      }
+    }
+    
+    return updatedTasks;
   }
 
   async getTaskStats() {
@@ -132,7 +178,7 @@ class TaskService {
       overdueCount: (await overdue).length,
       completionRate: total > 0 ? Math.round((completed / total) * 100) : 0
     };
-  }
+}
 }
 
 export default new TaskService();
