@@ -1,0 +1,37 @@
+[
+  {
+    "Id": 1,
+    "name": "Work",
+    "color": "#5b21b6",
+    "icon": "Briefcase",
+    "taskCount": 3
+  },
+  {
+    "Id": 2,
+    "name": "Personal",
+    "color": "#10b981",
+    "icon": "User",
+    "taskCount": 4
+  },
+  {
+    "Id": 3,
+    "name": "Development",
+    "color": "#3b82f6",
+    "icon": "Code",
+    "taskCount": 2
+  },
+  {
+    "Id": 4,
+    "name": "Health",
+    "color": "#f59e0b",
+    "icon": "Heart",
+    "taskCount": 0
+  },
+  {
+    "Id": 5,
+    "name": "Learning",
+    "color": "#8b5cf6",
+    "icon": "BookOpen",
+    "taskCount": 0
+  }
+]
